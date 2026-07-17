@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: cfp-conference-agent
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: REFRESH_INTERVAL_HOURS
+        value: "24"
+      - key: DATABASE_URL
+        value: sqlite:////opt/render/project/data/cfp_agent.db
+      - key: EXTRA_KEYWORDS
+        value: ""
+    disk:
+      name: cfp-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1

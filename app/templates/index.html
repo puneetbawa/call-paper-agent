@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CFP & Conference Schedule Agent</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>CFP & Conference Schedule Agent</h1>
+    <p>Auto-curated calls for papers &amp; conference schedules for
+      <strong>speech processing</strong>, <strong>speech applications</strong>,
+      <strong>NLP</strong>, and <strong>healthcare informatics</strong>.</p>
+    <form method="get" action="/" class="filters">
+      <select name="category">
+        <option value="">All categories</option>
+        {% for c in categories %}
+          <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" name="keyword" placeholder="Filter keyword (e.g. speaker recognition)" value="{{ selected_keyword }}" />
+      <button type="submit">Filter</button>
+      <a class="ics-link" href="/api/calendar.ics">Download .ics</a>
+    </form>
+  </header>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Deadline</th>
+          <th>When / Where</th>
+          <th>Matched keywords</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for e in events %}
+        <tr>
+          <td><a href="{{ e.link }}" target="_blank" rel="noopener">{{ e.title }}</a></td>
+          <td>{{ e.category }}</td>
+          <td>{{ e.deadline or "—" }}</td>
+          <td>{{ e.start_date or "" }} {{ e.location or "" }}</td>
+          <td class="kw">{{ e.matched_keywords }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">No events yet. Trigger <code>POST /api/refresh</code> or wait for the first scheduled run.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </main>
+
+  <footer>
+    <p>Data source: WikiCFP RSS feeds, filtered by keyword relevance. Refreshes automatically on a schedule; trigger manually via <code>POST /api/refresh</code>.</p>
+  </footer>
+</body>
+</html>
